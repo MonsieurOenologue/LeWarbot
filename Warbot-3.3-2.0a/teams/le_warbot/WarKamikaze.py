@@ -11,11 +11,11 @@ def actionWarKamikaze():
 				return("fire");
 
 		elif (percept.getType().equals(WarAgentType.WarBase)):
-				if (isEnemy(percept)):
-					setDebugString("Mode hunter")
-					setHeading(percept.getAngle())
-					setDebugString("KABOOOOOOM")
-					return("fire");
+			if (isEnemy(percept)):
+				setDebugString("Mode hunter")
+				setHeading(percept.getAngle())
+				setDebugString("KABOOOOOOM")
+				return("fire");
 
 	if (len(percepts) == 0):
 		setDebugString("No cible")

@@ -16,4 +16,4 @@ http://www.lirmm.fr/~ferber/ProgAgent/Manuel_Warbot3.pdf
 - Clone this repo
 - In the folder Warbot-3.3-2.0a click on warbot-3.3.0.jar or do the following command in the terminal :
 ```java -jar warbot3.3.0.jar```
-- Choose our team "LeWarbot" vs another team (you can make a folder in Warbot-3.3-2.0a/team and insert your own scripts to create a team)
+- Choose our team "LeWarbot" vs another team (you can make a folder in Warbot-3.3-2.0a/teams and insert your own scripts to create a team)
