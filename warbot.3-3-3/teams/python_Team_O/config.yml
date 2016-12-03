@@ -1,0 +1,16 @@
+Name: Team_O
+IconPath: Team_O.png
+SoundPath: Team_O.wav
+Description: |
+    You know what's better than one of me? FIVE MORE! Time for Devil Duplicates!
+BrainsPackage: inGameTeams.Team_O
+ScriptImplementation: python
+AgentsBrainClasses:
+    WarBase: WarBase.py
+    WarExplorer: WarExplorer.py
+    WarLight: WarLight.py
+    WarHeavy: WarHeavy.py
+    WarRocketLauncher: WarRocketLauncher.py
+    WarKamikaze: WarKamikaze.py
+    WarEngineer: WarEngineer.py
+    WarTurret: WarTurret.py
