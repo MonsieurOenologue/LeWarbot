@@ -4,6 +4,8 @@ def actionWarBase():
 	#On reçoit tous les messages alliés
 	messages = getMessages();
 
+	setDebugString("What?! My servants haven't destroyed you yet?");
+
 	for message in messages :
 		#Si un message demande notre position, on l'envoie à l'agent concerné
 		if(message.getMessage() == "whereAreYou") :
@@ -14,7 +16,7 @@ def actionWarBase():
 	enemies = getPerceptsEnemies();
 
 	#Si on perçoit un (ou +) ennemi(s), on appel à l'aide
-	if(enemies is not None and len(enemies) > 0) :
+	if(haveTargets(enemies)) :
 		setDebugString("Swiftly!");
 		broadcastMessageToAll("HELP", "");
 		#Si le sac n'est pas vide et que la vie est régénérable, on mange
@@ -22,10 +24,10 @@ def actionWarBase():
 			return eat();
 
 	#Détection des ingénieurs alliés
-	engineers = getPerceptsAlliesByType(WarAgentType.WarEngineer);
+	engineers = getPerceptsAlliesWarEngineer();
 
 	#Si on manque d'ingénieur(s)
-	if(engineers is None or len(engineers) < 5) :
+	if(len(engineers) < 5) :
 		#Si on ne peut pas encore en construire sans danger
 		if(getHealth() <= EngineerAction.COST) :
 			#Si le sac n'est pas vide et que la vie est régénérable, on mange
@@ -34,7 +36,7 @@ def actionWarBase():
 			#Sinon on attend
 			return idle();
 		#Et qu'il n'y a pas d'ingénieur proche, on en créé un
-		if(engineers is None or len(engineers) == 0) :
+		if(haveNoTargets(engineers)) :
 			setNextAgentToCreate(WarAgentType.WarEngineer);
 			return create();
 		#Et qu'on manque d'ingénieur(s) proche, on en créé un
@@ -54,7 +56,7 @@ def actionWarBase():
 		return create();
 
 	#Si le sac n'est pas vide et qu'on perçoit un (ou +) ingénieur(s) allié(s)
-	if(not isBagEmpty() and engineers is not None and len(engineers) > 0) :
+	if(not isBagEmpty() and haveNoTargets(engineers)) :
 		lowestEngineer = None;
 		for engineer in engineers :
 			#On cherche l'ingénieur à portée ayant la vie la plus basse

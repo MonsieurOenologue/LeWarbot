@@ -3,21 +3,24 @@ def actionWarExplorer():
 
     percepts = getPercepts();
 
-    for percept in percepts:
-        if(percept.getType().equals(WarAgentType.WarFood)):
-            if((percept.getDistance() < getMaxDistanceTakeFood()) and (not isBagFull())):
-                setHeading(percept.getAngle());
-                return take();
-            elif (not isBagFull()) :
-                setHeading(percept.getAngle());
+    for percept in percepts :
+        if(isEnemy(percept)) :
+            broadcastMessageToAll("HELP", "");
+        elif(isFood(percept)) :
+            broadcastMessageToAgentType(WarAgentType.WarExplorer, "food!", "");
 
-    if (isBagFull()) :
-        setDebugString("Reporting in.")
+        if(pickableFood(percept) and isNotBagFull()) :
+            face(percept);
+            return take();
+        elif(isFood(percept) and isNotBagFull()) :
+            face(percept);
 
-        percepts = getPerceptsAlliesByType(WarAgentType.WarBase);
+    if(isBagFull()) :
+        setDebugString("Reporting in.");
 
-        if((percepts is None) or (len(percepts) == 0)):
-            #broadcastMessageToAll("whereAreYou", "");
+        percepts = getPerceptsAlliesWarBase();
+
+        if((percepts is None) or (len(percepts) == 0)) :
 
             messages = getMessages();
 
@@ -39,7 +42,22 @@ def actionWarExplorer():
     else :
         setDebugString("I'll scout ahead!");
 
-    if (isBlocked()) :
-        RandomHeading()
+    angle1 = 0;
+    angle2 = 0;
+    currentHeading = getHeading();
 
-    return move()
+    if(isBlocked()) :
+        while(isBlocked()) :
+            if(angle1 == 360) :
+                return idle();
+            angle1 += 1;
+            setHeading(currentHeading + angle1);
+        setHeading(currentHeading);
+        while(isBlocked()) :
+            if(angle2 == -360) :
+                return idle();
+            angle2 -= 1;
+            setHeading(currentHeading + angle2);
+        setHeading(currentHeading + (angle1 if (angle1 < -angle2) else angle2));
+
+    return move();
