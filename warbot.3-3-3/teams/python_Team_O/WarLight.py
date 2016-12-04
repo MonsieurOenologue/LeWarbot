@@ -1,3 +1,4 @@
+
 def actionWarLight():
 
 	setDebugString("Armed and ready.");

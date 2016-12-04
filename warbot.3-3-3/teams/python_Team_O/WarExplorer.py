@@ -1,46 +1,66 @@
 
 def actionWarExplorer():
 
-    percepts = getPercepts();
+    setDebugString("I'll scout ahead!");
 
-    for percept in percepts :
-        if(isEnemy(percept)) :
-            broadcastMessageToAll("HELP", "");
-        elif(isFood(percept)) :
-            broadcastMessageToAgentType(WarAgentType.WarExplorer, "food!", "");
+    enemies = getPerceptsEnemies();
+    heading = getHeading();
+    direction = getViewDirection();
+    angle = 0;
 
-        if(pickableFood(percept) and isNotBagFull()) :
-            face(percept);
-            return take();
-        elif(isFood(percept) and isNotBagFull()) :
-            face(percept);
+    while(angle < 360) :
+
+        enemies = getPerceptsEnemies();
+
+        for enemy in enemies :
+            if(isBase(enemy)) :
+                setDebugString("Never underestimate the power of the Scout's code.");
+                broadcastMessageToAll("baseAcquired", "");
+            elif(not isFood(enemy)) :
+                setDebugString("You want Team_O? Come and get him!");
+                broadcastMessageToAll("HELP", "");
+            else :
+                setDebugString("I forget what started the fighting...");
+                sendMessageToExplorers("foodLocated", "");
+
+            if(pickableFood(enemy) and isNotBagFull()) :
+                face(enemy);
+                return take();
+            elif(isFood(enemy) and isNotBagFull() and not isBlocked()) :
+                face(enemy);
+                return move();
+
+        angle += angleOfView();
+        setHeading(heading + angle);
+        setViewDirection(direction + angle);
+
+    setHeading(heading);
+    setViewDirection(direction);
 
     if(isBagFull()) :
         setDebugString("Reporting in.");
 
-        percepts = getPerceptsAlliesWarBase();
+        bases = getPerceptsAlliesWarBase();
 
-        if((percepts is None) or (len(percepts) == 0)) :
+        if(haveNoTargets(bases)) :
 
             messages = getMessages();
 
             for message in messages :
-                if(message.getSenderType() == WarAgentType.WarBase):
-                    setHeading(message.getAngle());
+                if(isMessageOfWarBase(message)) :
+                    face(message);
 
-            broadcastMessageToAgentType(WarAgentType.WarBase, "whereAreYou", "");
+            sendMessageToBases("whereAreYou", "");
 
         else :
-            base = percepts[0];
+            base = bases[0];
 
-            if(base.getDistance() > maxDistanceGive()):
-                setHeading(base.getAngle());
-                return move();
-            else:
+            if(isPossibleToGiveFood(base)) :
                 setIdNextAgentToGive(base.getID());
                 return give();
-    else :
-        setDebugString("I'll scout ahead!");
+            elif(not isBlocked()) :
+                face(base);
+                return move();
 
     angle1 = 0;
     angle2 = 0;

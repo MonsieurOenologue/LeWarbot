@@ -1,29 +1,37 @@
 
 def actionWarEngineer():
 
-	percepts = getPerceptsAlliesByType(WarAgentType.WarBase);
+	bases = getPerceptsAlliesWarBase();
 
-	if((percepts is None) or (len(percepts) == 0)) :
-		messages = getMessages();
+	if(getHealth() > 20) :
+		if(haveNoTargets(bases)) :
+			messages = getMessages();
 
-		for message in messages :
-			if(message.getSenderType() == WarAgentType.WarBase) :
-				setHeading(message.getAngle());
+			for message in messages :
+				if(isMessageOfWarBase(message)) :
+					setHeading(message.getAngle());
+			
+			sendMessageToBases("whereAreYou", "");
+		else :
+			base = bases[0];
+			if(base.getHealth() < base.getMaxHealth()) :
+				face(base);
+				if(base.getDistance() > 4) :
+					if(not isBlocked()) :
+						return move();
+				else :
+					setIdNextBuildingToRepair(base.getID());
+					return EngineerAction.ACTION_REPAIR;
 
-		broadcastMessageToAgentType(WarAgentType.WarBase, "whereAreYou", "");
-	else :
-		base = percepts[0];
-		if(base.getDistance() > 2) :
-			setHeading(base.getAngle());
-			return move();
-		elif(base.getHealth() < base.getMaxHealth()) :
-			setIdNextBuildingToRepair(base.getID());
-			return EngineerAction.ACTION_REPAIR;
-		elif(not isBagEmpty()) :
-			return eat();
+	#if(getHealth() > TurretAction.COST) :
+		#return createTurret();
 
-	#if(isBlocked()) :
-		#RandomHeading();
-	#return move();
+	attempt = 0;
 
-	return idle();
+	while(isBlocked()) :
+		if(attempt > 9) :
+			return idle();
+		RandomHeading();
+		attempt += 1;
+
+	return move();
