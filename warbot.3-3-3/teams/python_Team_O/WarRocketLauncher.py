@@ -1,41 +1,48 @@
 def actionWarRocketLauncher():
 
-	percepts = getPercepts();
+	setDebugString("Armed and ready.");
 
-	for percept in percepts:
-		if (percept.getType().equals(WarAgentType.WarRocketLauncher) or percept.getType().equals(WarAgentType.WarLight) or percept.getType().equals(WarAgentType.WarHeavy)):
-			if (isEnemy(percept)):
-				setDebugString("That's gotta sting.")
-				setHeading(percept.getAngle())
+	enemies = getPerceptsEnemies();
+	worstEnemy = None;
 
-				if (isReloaded()):
-					setTargetDistance(percept.getDistance())
-					return fire()
-				else :
-					return reloadWeapon()
-			else:
-				setDebugString("Armed and ready.")
+	for enemy in enemies :
+		if(isFood(enemy)) :
+			sendMessageToExplorers("foodLocated", "");
+			continue;
+		if(isBase(enemy)) :
+			setDebugString("Looks like I'll have to do it MYSELF!");
+			face(enemy);
+			return shootTarget();
+		if(worstEnemy is None) :
+			worstEnemy = enemy;
+		elif(isEngineer(enemy) and not isEngineer(worstEnemy)) :
+			worstEnemy = enemy;
+		elif(enemy.getType().equals(WarAgentType.WarHeavy) and not worstEnemy.getType().equals(WarAgentType.WarHeavy)) :
+			worstEnemy = enemy;
+		elif(isKamikaze(enemy) and not isKamikaze(worstEnemy)) :
+			worstEnemy = enemy;
+		elif(isRocketLauncher(enemy) and not isRocketLauncher(worstEnemy)) :
+			worstEnemy = enemy;
+		elif(isTurret(enemy) and not isTurret(worstEnemy)) :
+			worstEnemy = enemy;
+		elif(enemy.getType().equals(WarAgentType.WarLight) and not worstEnemy.getType().equals(WarAgentType.WarLight)) :
+			worstEnemy = enemy;
+		else :
+			worstEnemy = enemy;
 
-		elif (percept.getType().equals(WarAgentType.WarBase)):
-				if (isEnemy(percept)):
-					setDebugString("That's gotta sting.")
-					setHeading(percept.getAngle())
+	if(worstEnemy is not None) :
+		setDebugString("That's gotta sting.");
+		face(worstEnemy);
+		return shootTarget();
+	elif(not isReloaded()) :
+		return reloadWeapon();
 
-					if (isReloaded()):
-						setTargetDistance(percept.getDistance())
-						return fire()
-					else :
-						return reloadWeapon()
-				else:
-					setDebugString("Armed and ready.")
-		else:
-			setDebugString("Armed and ready.")
+	attempt = 0;
 
-	if (len(percepts) == 0):
-		setDebugString("Armed and ready.")
-
-	if(isBlocked()):
-		RandomHeading()
-
+	while(isBlocked()) :
+		if(attempt > 9) :
+			return idle();
+		RandomHeading();
+		attempt += 1;
 
 	return move();

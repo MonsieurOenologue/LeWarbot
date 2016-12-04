@@ -15,43 +15,43 @@ def actionWarBase():
 	#Détection des ennemis
 	enemies = getPerceptsEnemies();
 
+	#Détection des ingénieurs alliés
+	engineers = getPerceptsAlliesWarEngineer();
+
 	#Si on perçoit un (ou +) ennemi(s), on appel à l'aide
 	if(haveTargets(enemies)) :
 		setDebugString("Swiftly!");
 		broadcastMessageToAll("HELP", "");
+		#Si on manque d'ingénieur(s)
+		if(len(engineers) < 5) :
+			#Si on ne peut pas encore en construire sans danger
+			if(getHealth() <= EngineerAction.COST) :
+				#Si le sac n'est pas vide et que la vie est régénérable, on mange
+				if(not isBagEmpty() and getHealth() + getFoodHealthGiven() <= getMaxHealth()) :
+					return eat();
+				#Sinon on attend
+				return idle();
+			#Et qu'il n'y a pas d'ingénieur proche, on en créé un
+			if(haveNoTargets(engineers)) :
+				return createEngineer();
+			#Et qu'on manque d'ingénieur(s) proche, on en créé un
+			if(len(engineers) < 5) :
+				#Mais seulement si chaque ingénieur est déjà trop affaibli
+				length = 0;
+				for engineer in engineers :
+					if(engineer.getHealth() * 10 < engineer.getMaxHealth()) :
+						length += 1;
+				if(length == len(engineers)) :
+					return createEngineer();
+			elif(getHealth() > HeavyAction.COST + getMaxHealth() / 3) :
+				setNextAgentToCreate(WarAgentType.WarHeavy);
+				return create();
 		#Si le sac n'est pas vide et que la vie est régénérable, on mange
 		if(not isBagEmpty() and getHealth() + getFoodHealthGiven() <= getMaxHealth()) :
 			return eat();
 
-	#Détection des ingénieurs alliés
-	engineers = getPerceptsAlliesWarEngineer();
-
-	#Si on manque d'ingénieur(s)
-	if(len(engineers) < 5) :
-		#Si on ne peut pas encore en construire sans danger
-		if(getHealth() <= EngineerAction.COST) :
-			#Si le sac n'est pas vide et que la vie est régénérable, on mange
-			if(not isBagEmpty() and getHealth() + getFoodHealthGiven() <= getMaxHealth()) :
-				return eat();
-			#Sinon on attend
-			return idle();
-		#Et qu'il n'y a pas d'ingénieur proche, on en créé un
-		if(haveNoTargets(engineers)) :
-			setNextAgentToCreate(WarAgentType.WarEngineer);
-			return create();
-		#Et qu'on manque d'ingénieur(s) proche, on en créé un
-		if(len(engineers) < 5) :
-			#Mais seulement si chaque ingénieur est déjà trop affaibli
-			length = 0;
-			for engineer in engineers :
-				if(engineer.getHealth() * 10 < engineer.getMaxHealth()) :
-					length += 1;
-			if(length == len(engineers)) :
-				setNextAgentToCreate(WarAgentType.WarEngineer);
-				return create();
-
 	#Si on peut construire un char, on le fait
-	if(getHealth() > HeavyAction.COST) :
+	if(getHealth() > HeavyAction.COST + getMaxHealth() / 3) :
 		setNextAgentToCreate(WarAgentType.WarHeavy);
 		return create();
 
@@ -71,9 +71,6 @@ def actionWarBase():
 	#Si le sac n'est pas vide et que la vie est régénérable, on mange
 	if(not isBagEmpty() and getHealth() + getFoodHealthGiven() <= getMaxHealth()) :
 		return eat();
-	#elif(getNbElementsInBag() * 250 > 499 and getHealth() > 0.75 * getMaxHealth()) :
-		#setNextAgentToCreate(WarAgentType.WarHeavy);
-		#return create();
 
 	#Ne rien faire
 	return idle();
