@@ -23,9 +23,6 @@ def actionWarEngineer():
 					setIdNextBuildingToRepair(base.getID());
 					return EngineerAction.ACTION_REPAIR;
 
-	#if(getHealth() > TurretAction.COST) :
-		#return createTurret();
-
 	attempt = 0;
 
 	while(isBlocked()) :

@@ -4,6 +4,7 @@ def actionWarLight():
 	setDebugString("Armed and ready.");
 
 	enemies = getPerceptsEnemies();
+	messages = getMessages();
 	worstEnemy = None;
 
 	for enemy in enemies :
@@ -37,6 +38,14 @@ def actionWarLight():
 		return shootTarget();
 	elif(not isReloaded()) :
 		return reloadWeapon();
+
+	for message in messages :
+		if(message.getMessage() == "baseAcquired") :
+			setHeading(message.getAngle());
+			if(isBlocked()) :
+				return idle();
+			else :
+				return move();
 
 	attempt = 0;
 

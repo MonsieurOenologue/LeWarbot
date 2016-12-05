@@ -16,6 +16,11 @@ def actionWarExplorer():
             if(isBase(enemy)) :
                 setDebugString("Never underestimate the power of the Scout's code.");
                 broadcastMessageToAll("baseAcquired", "");
+                face(enemy);
+                if(isBlocked()) :
+                    return idle();
+                else :
+                    return move();
             elif(not isFood(enemy)) :
                 setDebugString("You want Team_O? Come and get him!");
                 broadcastMessageToAll("HELP", "");
@@ -62,11 +67,10 @@ def actionWarExplorer():
                 face(base);
                 return move();
 
-    angle1 = 0;
-    angle2 = 0;
-    currentHeading = getHeading();
-
     if(isBlocked()) :
+        angle1 = 0;
+        angle2 = 0;
+        currentHeading = getHeading();
         while(isBlocked()) :
             if(angle1 == 360) :
                 return idle();
