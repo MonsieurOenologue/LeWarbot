@@ -8,10 +8,11 @@ def actionWarTurret():
 
 	for enemy in enemies :
 		if(isFood(enemy)) :
-			sendMessageToExplorers("foodLocated", "");
+			sendMessageToExplorers("foodLocated", [repr(enemy.getDistance()), repr(enemy.getAngle())]);
 			continue;
 		if(isBase(enemy)) :
 			setDebugString("Looks like I'll have to do it MYSELF!");
+			broadcastMessageToAll("baseAcquired", [repr(enemy.getDistance()), repr(enemy.getAngle())]);
 			face(enemy);
 			return shootTarget();
 		if(worstEnemy is None) :

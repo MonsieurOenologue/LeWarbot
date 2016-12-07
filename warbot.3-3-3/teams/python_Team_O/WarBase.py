@@ -25,7 +25,7 @@ def actionWarBase():
 			if(not isFood(enemy)) :
 				#On appel à l'aide
 				setDebugString("Swiftly!");
-				broadcastMessageToAll("HELP", "");
+				broadcastMessageToAll("HELP", [repr(enemy.getDistance()), repr(enemy.getAngle())]);
 				#S'il n'est pas inoffensif
 				if(not isExplorer(enemy)) :
 					#Si on manque d'ingénieur(s)

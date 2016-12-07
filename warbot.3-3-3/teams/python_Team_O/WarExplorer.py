@@ -4,43 +4,29 @@ def actionWarExplorer():
     setDebugString("I'll scout ahead!");
 
     enemies = getPerceptsEnemies();
-    heading = getHeading();
-    direction = getViewDirection();
-    angle = 0;
 
-    while(angle < 360) :
-
-        enemies = getPerceptsEnemies();
-
-        for enemy in enemies :
-            if(isBase(enemy)) :
-                setDebugString("Never underestimate the power of the Scout's code.");
-                broadcastMessageToAll("baseAcquired", "");
-                face(enemy);
-                if(isBlocked()) :
-                    return idle();
-                else :
-                    return move();
-            elif(not isFood(enemy)) :
-                setDebugString("You want Team_O? Come and get him!");
-                broadcastMessageToAll("HELP", "");
+    for enemy in enemies :
+        if(isBase(enemy)) :
+            setDebugString("Never underestimate the power of the Scout's code.");
+            broadcastMessageToAll("baseAcquired", [repr(enemy.getDistance()), repr(enemy.getAngle())]);
+            face(enemy);
+            if(enemy.getDistance() < 2 or isBlocked()) :
+                return idle();
             else :
-                setDebugString("I forget what started the fighting...");
-                sendMessageToExplorers("foodLocated", "");
-
-            if(pickableFood(enemy) and isNotBagFull()) :
-                face(enemy);
-                return take();
-            elif(isFood(enemy) and isNotBagFull() and not isBlocked()) :
-                face(enemy);
                 return move();
+        elif(not isFood(enemy)) :
+            setDebugString("You want Team_O? Come and get him!");
+            broadcastMessageToAll("HELP", [repr(enemy.getDistance()), repr(enemy.getAngle())]);
+        else :
+            setDebugString("I forget what started the fighting...");
+            sendMessageToExplorers("foodLocated", [repr(enemy.getDistance()), repr(enemy.getAngle())]);
 
-        angle += angleOfView();
-        setHeading(heading + angle);
-        setViewDirection(direction + angle);
-
-    setHeading(heading);
-    setViewDirection(direction);
+        if(pickableFood(enemy) and isNotBagFull()) :
+            face(enemy);
+            return take();
+        elif(isFood(enemy) and isNotBagFull() and not isBlocked()) :
+            face(enemy);
+            return move();
 
     if(isBagFull()) :
         setDebugString("Reporting in.");
@@ -74,13 +60,13 @@ def actionWarExplorer():
         while(isBlocked()) :
             if(angle1 == 360) :
                 return idle();
-            angle1 += 1;
+            angle1 += 15;
             setHeading(currentHeading + angle1);
         setHeading(currentHeading);
         while(isBlocked()) :
             if(angle2 == -360) :
                 return idle();
-            angle2 -= 1;
+            angle2 -= 15;
             setHeading(currentHeading + angle2);
         setHeading(currentHeading + (angle1 if (angle1 < -angle2) else angle2));
 
