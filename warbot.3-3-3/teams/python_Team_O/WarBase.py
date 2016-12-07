@@ -3,6 +3,7 @@ def actionWarBase():
 
 	#On reçoit tous les messages alliés
 	messages = getMessages();
+	explorer = 0;
 
 	setDebugString("What?! My servants haven't destroyed you yet?");
 
@@ -11,12 +12,17 @@ def actionWarBase():
 		if(message.getMessage() == "whereAreYou") :
 			setDebugString("Yes, sir!");
 			sendMessage(message.getSenderID(), "here", "");
+		elif(message.getMessage() == "bornToBeAlive") :
+			explorer += 1;
 
 	#Détection des ennemis
 	enemies = getPerceptsEnemies();
 
 	#Détection des ingénieurs alliés
 	engineers = getPerceptsAlliesWarEngineer();
+
+	#On demande aux unités de jouer sur la défensive
+	broadcastMessageToAll("beSafe", "");
 
 	#Si on perçoit un (ou +) ennemi(s)
 	if(haveTargets(enemies)) :
@@ -26,8 +32,8 @@ def actionWarBase():
 				#On appel à l'aide
 				setDebugString("Swiftly!");
 				broadcastMessageToAll("HELP", [repr(enemy.getDistance()), repr(enemy.getAngle())]);
-				#S'il n'est pas inoffensif
-				if(not isExplorer(enemy)) :
+				#S'il n'est pas inoffensif et qu'ils sont nombreux
+				if(not isExplorer(enemy) and len(enemies) >= len(heavys)) :
 					#Si on manque d'ingénieur(s)
 					if(len(engineers) < 5) :
 						#Si on ne peut pas encore en construire sans danger
@@ -52,6 +58,10 @@ def actionWarBase():
 					if(not isBagEmpty() and getHealth() + getFoodHealthGiven() <= getMaxHealth()) :
 						return eat();
 
+	#Si on manque d'explorateurs, on en créé un
+	if(explorer < 5 and getHealth() > ExplorerAction.COST + getMaxHealth() / 3) :
+		setNextAgentToCreate(WarAgentType.WarExplorer);
+		return create();
 	#Si on peut construire un char, on le fait
 	if(getHealth() > HeavyAction.COST + getMaxHealth() / 3) :
 		setNextAgentToCreate(WarAgentType.WarHeavy);

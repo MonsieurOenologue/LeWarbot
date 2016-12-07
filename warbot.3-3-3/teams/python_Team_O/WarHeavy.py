@@ -42,17 +42,18 @@ def actionWarHeavy():
 
 	messages = getMessages();
 	relevantMessage = None;
-	significantDist = None;
 
 	for message in messages :
-		if(message.getMessage() == "HELP" and isMessageOfWarBase(message) and (relevantMessage is None or message.getDistance() < relevantMessage.getDistance())) :
+		if(message.getMessage() == "HELP" and isMessageOfWarBase(message) and (relevantMessage is None or relevantMessage.getMessage() == "beSafe" or message.getDistance() < relevantMessage.getDistance())) :
 			relevantMessage = message;
-		elif(message.getMessage() == "baseAcquired" and (relevantMessage is None or message.getDistance() < relevantMessage.getDistance())) :
+		elif(message.getMessage() == "baseAcquired" and (relevantMessage is None or relevantMessage.getMessage() == "beSafe" or message.getDistance() < relevantMessage.getDistance())) :
 			relevantMessage = message;
 		#elif(message.getMessage() == "HELP" and (relevantMessage is None or message.getDistance() * 2 < relevantMessage.getDistance() + 50)) :
 			#relevantMessage = message;
+		elif(message.getMessage() == "beSafe" and relevantMessage is None) :
+			relevantMessage = message;
 
-	if(relevantMessage is not None) :
+	if(relevantMessage is not None and relevantMessage.getMessage() != "beSafe") :
 		setDebugString("Captain Team_O on duty.");
 		data = relevantMessage.getContent();
 		if(len(data) > 1) :
@@ -65,6 +66,8 @@ def actionWarHeavy():
 			Cr = sqrt(Cx * Cx + Cy * Cy);
 			C0 = degrees(atan2(Cy, Cx));
 			setHeading(C0);
+	elif(relevantMessage is not None and isMessageOfWarBase(relevantMessage) and relevantMessage.getDistance() > BaseAction.DISTANCE_OF_VIEW - 10) :
+		face(message);
 
 	attempt = 0;
 

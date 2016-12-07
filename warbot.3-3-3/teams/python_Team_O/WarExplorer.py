@@ -1,9 +1,12 @@
+from random import randint
 
 def actionWarExplorer():
 
     setDebugString("I'll scout ahead!");
 
     enemies = getPerceptsEnemies();
+
+    sendMessageToBases("bornToBeAlive", "");
 
     for enemy in enemies :
         if(isBase(enemy)) :
@@ -45,13 +48,10 @@ def actionWarExplorer():
 
         else :
             base = bases[0];
-
+            face(base);
             if(isPossibleToGiveFood(base)) :
                 setIdNextAgentToGive(base.getID());
                 return give();
-            elif(not isBlocked()) :
-                face(base);
-                return move();
 
     if(isBlocked()) :
         angle1 = 0;
@@ -60,13 +60,13 @@ def actionWarExplorer():
         while(isBlocked()) :
             if(angle1 == 360) :
                 return idle();
-            angle1 += 15;
+            angle1 += randint(1, 30);
             setHeading(currentHeading + angle1);
         setHeading(currentHeading);
         while(isBlocked()) :
             if(angle2 == -360) :
                 return idle();
-            angle2 -= 15;
+            angle2 -= randint(1, 30);
             setHeading(currentHeading + angle2);
         setHeading(currentHeading + (angle1 if (angle1 < -angle2) else angle2));
 
